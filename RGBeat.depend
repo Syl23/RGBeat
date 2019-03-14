@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1552558961 source:/auto_home/sleclerc/Documents/RGBeat/RGBeat/main.cpp
+	<SFML/Graphics.hpp>
+	<SFML/Audio.hpp>
+	<iostream>
+
