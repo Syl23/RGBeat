@@ -1,0 +1,24 @@
+void clickBoule(int ymin, int ymax, int player, int x, float tab[NBP][NBB][COO]) {
+    for (int i = 0; i < sizeof(tab[player]); i++) {
+        if (x > tab[player][i][0]-30 && x < tab[player][i][0]+30) {
+            if (tab[player][i][1] > ymin && tab[player][i][1] < ymax) {
+                tab[player][i][1] = 0;
+            }
+        }
+    }
+}
+
+
+    // Joueur 1
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) clickBoule(700, 1000, 0, COL1, boules);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z)) clickBoule(700, 1000, 0, COL2, boules);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E)) clickBoule(700, 1000, 0, COL3, boules);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) clickBoule(700, 1000, 0, COL4, boules);
+
+    // Joueur 2
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::U)) clickBoule(700, 1000, 1, COL1, boules);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::I)) clickBoule(700, 1000, 1, COL2, boules);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::O)) clickBoule(700, 1000, 1, COL3, boules);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P)) clickBoule(700, 1000, 1, COL4, boules);
