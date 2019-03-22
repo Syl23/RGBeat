@@ -11,6 +11,7 @@ using namespace std;
 #define COL2 807
 #define COL3 1113
 #define COL4 1420
+#define TOP 700
 
 #define BOULESRAD 20 // rayon des boulles
 #define FPS 60
@@ -18,11 +19,6 @@ using namespace std;
 
 
 
-struct NivBoul{
-    int clicTime;
-    int col;
-    int joueur;
-};
 
 
 
@@ -96,46 +92,45 @@ void updatePoses(float boules[NBP][NBB][COO], float speed){
 	for (int y = 0; y < NBB; y++){
 
 
-    if (boules[x][y][1]!=-1)
+    if (boules[x][y][0]!=-1)
 	boules[x][y][1]=boules[x][y][1]+speed;
 
-	if (boules[x][y][1]>1080)
-	boules[x][y][0]=-1;
-	boules[x][y][1]=-1;
+	if (boules[x][y][1]>1080){
+        boules[x][y][0]=-1;
+        boules[x][y][1]=-1;
+	}
 
 	}
 
 }
 
-void updateBoulesLevel(float boules[NBP][NBB][COO],int time,int *index,NivBoul niveau[]){
+void updateBoulesLevel(float boules[NBP][NBB][COO],int time,int *index,int niveau[8][3],int tailleNiveau){
 
     int i = *index;
 
 
-    while(i<sizeof(niveau) && niveau[i].clicTime <= time+(1080/(FPS*SPEED/1000))){
+
+    while(i<tailleNiveau && niveau[i][0] <= time+FPS*SPEED){
 
         int freeBoule = 0;
 
-        while(boules[niveau[i].joueur-1][freeBoule][0] != -1) freeBoule++;
+        while(boules[niveau[i][2]-1] [freeBoule][0] != -1 && freeBoule<=tailleNiveau) freeBoule++;
 
 
-        if(niveau[i].col == 1);
-        boules[niveau[i].joueur-1][freeBoule][0] = COL1;
+        if(niveau[i][1] == 1)
+        boules[niveau[i][2]-1][freeBoule][0] = COL1-BOULESRAD;
 
-        if(niveau[i].col == 2);
-        boules[niveau[i].joueur-1][freeBoule][0] = COL2;
+        if(niveau[i][1] == 2)
+        boules[niveau[i][2]-1][freeBoule][0] = COL2-BOULESRAD;
 
-        if(niveau[i].col == 3);
-        boules[niveau[i].joueur-1][freeBoule][0] = COL3;
+        if(niveau[i][1] == 3)
+        boules[niveau[i][2]-1][freeBoule][0] = COL3-BOULESRAD;
 
-        if(niveau[i].col == 4);
-        boules[niveau[i].joueur-1][freeBoule][0] = COL4;
-
-
+        if(niveau[i][1] == 4)
+        boules[niveau[i][2]-1][freeBoule][0] = COL4-BOULESRAD;
 
 
-        boules[niveau[i].joueur-1][freeBoule][1] = 0;
-
+        boules[niveau[i][2]-1][freeBoule][1] = 0;
 
 
         i++;
@@ -150,11 +145,15 @@ void updateBoulesLevel(float boules[NBP][NBB][COO],int time,int *index,NivBoul n
 
 }
 
+
 void clickBoule(int ymin, int ymax, int player, int x, float tab[NBP][NBB][COO]) {
-    for (int i = 0; i < sizeof(tab[player]); i++) {
-        if (x > tab[player][i][0]-30 && x < tab[player][i][0]+30) {
-            if (tab[player][i][1] > ymin && tab[player][i][1] < ymax) {
+    for (int i = 0; i < NBB; i++) {
+        if (x > tab[player][i][0]-BOULESRAD-5 && x < tab[player][i][0]+BOULESRAD+5) {
+            if (tab[player][i][1] > ymin-BOULESRAD && tab[player][i][1] < ymax-BOULESRAD) {
                 tab[player][i][1] = 0;
+            } else if ((tab[player][i][1] < ymin-BOULESRAD-15 && tab[player][i][1] > ymin-BOULESRAD-35) || (tab[player][i][1] > ymax-BOULESRAD+15 && tab[player][i][1] < ymax-BOULESRAD+35)) {
+                tab[player][i][1] = 0;
+                cout<<"error";
             }
         }
     }
@@ -169,7 +168,7 @@ int main()
 {
 
 
-    NivBoul niveau[] = {{0,1,1},{500,2,1},{1000,3,1},{1500,4,1},{500,1,2},{1000,2,2},{1500,3,2},{2000,4,2}}; // un niveau a la con pour tester
+    int niveau[8][3] = {{1000,1,1},{2000,2,1},{3000,3,1},{4000,4,1},{5000,1,2},{6000,2,2},{7000,3,2},{8000,4,2}}; // un niveau a la con pour tester
 
     int time=0;
     int index =0;
@@ -220,6 +219,8 @@ int main()
 
     // Joueur 1
 
+
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) clickBoule(700, 1000, 0, COL1, boules);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z)) clickBoule(700, 1000, 0, COL2, boules);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E)) clickBoule(700, 1000, 0, COL3, boules);
@@ -254,8 +255,26 @@ int main()
     app.clear(sf::Color::Black);
 
 
-    updateBoulesLevel(boules,time,&index,niveau); // le core dupde viens de la
-    updatePoses(boules,1);
+    /*
+    sf::Vertex fond[] =
+    {
+        sf::Vertex(sf::Vector2f(0, 0)),
+        sf::Vertex(sf::Vector2f(1920, 0)),
+        sf::Vertex(sf::Vector2f(1920, 1080)),
+        sf::Vertex(sf::Vector2f(0, 1080)),
+
+    };
+
+    fond[0].color = sf::Color(200,200,200);
+    fond[1].color = sf::Color(100,100,100);
+    fond[2].color = sf::Color(200,200,200);
+    fond[3].color = sf::Color(100,100,100);
+
+    app.draw(fond, 4, sf::Quads);
+    */
+
+    updateBoulesLevel(boules,time,&index,niveau,8);
+    updatePoses(boules,5);
 
 
 
@@ -277,6 +296,7 @@ int main()
 
 
 
+
     for (int x = 0; x < NBP; x++)
 	for (int y = 0; y < NBB; y++)
 	for (int z = 0; z < COO; z++)
@@ -292,6 +312,37 @@ int main()
             app.draw(shape);
         }
     }
+
+    sf::Vertex quad[] =
+    {
+        sf::Vertex(sf::Vector2f(COL1-BOULESRAD-10, TOP)),
+        sf::Vertex(sf::Vector2f(COL1+BOULESRAD+10, TOP)),
+        sf::Vertex(sf::Vector2f(COL1+BOULESRAD+10, TOP+2*BOULESRAD+20)),            // Rectangle 1
+        sf::Vertex(sf::Vector2f(COL1-BOULESRAD-10, TOP+2*BOULESRAD+20)),
+
+        sf::Vertex(sf::Vector2f(COL2-BOULESRAD-10, TOP)),
+        sf::Vertex(sf::Vector2f(COL2+BOULESRAD+10, TOP)),
+        sf::Vertex(sf::Vector2f(COL2+BOULESRAD+10, TOP+2*BOULESRAD+20)),            // Rectangle 2
+        sf::Vertex(sf::Vector2f(COL2-BOULESRAD-10, TOP+2*BOULESRAD+20)),
+
+        sf::Vertex(sf::Vector2f(COL3-BOULESRAD-10, TOP)),
+        sf::Vertex(sf::Vector2f(COL3+BOULESRAD+10, TOP)),
+        sf::Vertex(sf::Vector2f(COL3+BOULESRAD+10, TOP+2*BOULESRAD+20)),            // Rectangle 3
+        sf::Vertex(sf::Vector2f(COL3-BOULESRAD-10, TOP+2*BOULESRAD+20)),
+
+        sf::Vertex(sf::Vector2f(COL4-BOULESRAD-10, TOP)),
+        sf::Vertex(sf::Vector2f(COL4+BOULESRAD+10, TOP)),
+        sf::Vertex(sf::Vector2f(COL4+BOULESRAD+10, TOP+2*BOULESRAD+20)),            // Rectangle 4
+        sf::Vertex(sf::Vector2f(COL4-BOULESRAD-10, TOP+2*BOULESRAD+20))
+    };
+
+
+    for (int i = 0; i < 16; i+=2) {
+        quad[i].color = sf::Color(0, 0, 200, 100);
+        quad[i+1].color = sf::Color(255, 200, 200, 150);
+    }
+
+app.draw(quad, 16, sf::Quads);
 
 
 
