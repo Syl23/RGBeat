@@ -22,3 +22,10 @@ void clickBoule(int ymin, int ymax, int player, int x, float tab[NBP][NBB][COO])
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::I)) clickBoule(700, 1000, 1, COL2, boules);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::O)) clickBoule(700, 1000, 1, COL3, boules);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P)) clickBoule(700, 1000, 1, COL4, boules);
+
+
+
+vendredi 22 mars : 
+
+dans la fonction clickBoule, il faut remplacer i < sizeof(boules[NBP]) par i < NBB
+
