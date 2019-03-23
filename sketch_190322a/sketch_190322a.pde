@@ -44,7 +44,7 @@ void keyPressed(){
   if (key=='a' || key=='z' || key=='e' || key=='r')
   print(",1},");
   else
-  print(",2azeu},");
+  print(",2},");
   
 }
   
