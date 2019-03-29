@@ -2,6 +2,8 @@
 #include <SFML/Audio.hpp>
 #include <iostream>
 #include "niveau.h"
+#include <string>
+#include <math.h>
 
 using namespace std;
 
@@ -19,6 +21,14 @@ using namespace std;
 #define BOULESRAD 30 // rayon des boulles
 #define FPS 60
 #define SPEED 10
+
+#define LVL u
+#define MUSIQUE "bien.wav"
+
+
+
+
+
 
 
 void affTab(float boules[NBP][NBB][COO]){
@@ -74,7 +84,7 @@ void graphicUpdate(float boules[NBP][NBB][COO],sf::RenderWindow screen,sf::Circl
 	}
 }
 
-void updatePoses(float boules[NBP][NBB][COO], float speed){
+void updatePoses(float boules[NBP][NBB][COO], float speed,int *score){
 
     for (int x = 0; x < NBP; x++){
         for (int y = 0; y < NBB; y++){
@@ -84,6 +94,7 @@ void updatePoses(float boules[NBP][NBB][COO], float speed){
             if (boules[x][y][1]>1080){
                 boules[x][y][0]=-1;
                 boules[x][y][1]=-1;
+                *score -=5;
             }
         }
     }
@@ -145,14 +156,14 @@ void clickBoule(int ymin, int ymax, int player, int x, float tab[NBP][NBB][COO],
             if (tab[player][i][1] > ymin-BOULESRAD && tab[player][i][1] < ymax-BOULESRAD) {
                 tab[player][i][0] = -1;
                 tab[player][i][1] = -1;
-                *score +=5;
+                *score +=1;
                 animate(window, COL1, 2, 2, animation);
             } else if ((tab[player][i][1] < ymin-BOULESRAD-15 && tab[player][i][1] > ymin-BOULESRAD-35) || (tab[player][i][1] > ymax-BOULESRAD+15 && tab[player][i][1] < ymax-BOULESRAD+35)) {
                 tab[player][i][0] = -1;
                 tab[player][i][1] = -1;
                 //drawCross();
-                cout<<"error";
-                *score -=5;
+                //cout<<"error";
+                *score -=2;
             }
         }
     }
@@ -163,6 +174,7 @@ int main()
 {
     int score = 0;
     int len = 0;
+
 
     //int niveau[][3] = u;
 
@@ -187,7 +199,7 @@ int main()
     resetBoules(boules);
 
 
-    const string titre = "bien.wav";
+    const string titre = MUSIQUE;
 
     sf::Music music;
 
@@ -196,8 +208,8 @@ int main()
 
 
     music.play();
-    len = music.size;
-    cout<<len<<endl;
+    len = music.getDuration().asMilliseconds();
+    //cout<<len<<endl;
 
     sf::Clock clock;
 
@@ -242,9 +254,9 @@ int main()
     app.clear(sf::Color(50, 50, 50));
 
 
-    updateBoulesLevel(boules,time,&index,u,sizeof(u)/12);
+    updateBoulesLevel(boules,time,&index,LVL,sizeof(LVL)/12);
     //updateBoulesLevel(boules,time,&index,niveau,sizeof(niveau)/3);
-    updatePoses(boules,SPEED);
+    updatePoses(boules,SPEED,&score);
 
 
 
@@ -351,6 +363,90 @@ int main()
         shapes[0].setRadius(BOULESRAD);
         app.draw(shapes[0]);
     }
+
+    sf::Font font;
+    font.loadFromFile("arial.ttf");
+    // Create a text
+    sf::Text text(std::to_string(score), font);
+    text.setCharacterSize(30);
+    text.setStyle(sf::Text::Bold);
+    text.setFillColor(sf::Color::Red);
+    // Draw it
+    app.draw(text);
+
+
+
+
+
+    if(0<time){
+
+
+        app.clear(sf::Color(10*2, 10*2, 10*2));
+            // Declare and load a font
+        sf::Font font;
+        font.loadFromFile("/auto_home/sleclerc/Documents/RGBeat/RGBeat/FONTS/traveling_typewriter/TravelingTypewriter.ttf");
+        // Create a text
+        sf::Text text("Ton score : "+std::to_string(score), font);
+        text.setCharacterSize(100);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(1920/2-int(log10(abs(score)))*50-12*25,1080/2-150-100);
+        app.draw(text);
+
+        text.setString("Le score max est : "+std::to_string(sizeof(u)/12));
+        text.setCharacterSize(100);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(1920/2-23*25,1080/2-100);
+        app.draw(text);
+
+        text.setString("Le score min est : -"+std::to_string((sizeof(u)/12)*5));
+        text.setCharacterSize(100);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(1920/2-23*25,1080/2+100-100);
+        app.draw(text);
+
+        text.setString("R");
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color::Red);
+        text.setPosition(0,0);
+        app.draw(text);
+
+        text.setString("G");
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color::Green);
+        text.setPosition(30,0);
+        app.draw(text);
+
+        text.setString("B");
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color::Blue);
+        text.setPosition(60,0);
+        app.draw(text);
+
+        text.setString("eat");
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color(255,0,255));
+        text.setPosition(90,0);
+        app.draw(text);
+
+        text.setString("Merci Kellian et Sylvain");
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color(255,255,0));
+        text.setPosition(10,1080-75);
+        app.draw(text);
+
+        text.setString("Developed by Kellian et Sylvain using SFML and no fucking ide");
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color(255,255,0));
+        text.setPosition(10,1080-75-50);
+        app.draw(text);
+
+
+
+
+    }
+
+
+
 
 
 
